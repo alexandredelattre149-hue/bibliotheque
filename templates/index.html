@@ -101,11 +101,28 @@
         {% endif %}
 
         <div class="actions">
-            <a href="/favorite/{{ b[0] }}">
-                {{ "❤️ Favori" if b[10] else "🤍 Favori" }}
-            </a>
-        </div>
-    </div>
+    <form method="post" action="/status/{{ b[0] }}" style="display:inline;">
+        <select name="status" onchange="this.form.submit()">
+            <option value="bibliotheque" {{ "selected" if b[9]=="bibliotheque" else "" }}>
+                📚 Bibliothèque
+            </option>
+            <option value="pal" {{ "selected" if b[9]=="pal" else "" }}>
+                📖 À lire (PAL)
+            </option>
+            <option value="encours" {{ "selected" if b[9]=="encours" else "" }}>
+                ⏳ En cours
+            </option>
+            <option value="lu" {{ "selected" if b[9]=="lu" else "" }}>
+                ✅ Lu
+            </option>
+        </select>
+    </form>
+
+    &nbsp;•&nbsp;
+
+    <a href="/favorite/{{ b[0] }}">
+        {{ "❤️ Favori" if b[10] else "🤍 Favori" }}
+    </a>
 </div>
 {% endfor %}
 
