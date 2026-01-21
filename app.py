@@ -65,50 +65,52 @@ def login():
             return redirect("/library")
 
     return render_template("login.html", first=False)
-
-@app.route("/library", methods=["GET", "POST"])
+    @app.route("/library", methods=["GET", "POST"])
 def library():
     if not session.get("auth"):
         return redirect("/")
 
     if request.method == "POST":
-        isbn = request.form["isbn"]
+        isbn = request.form["isbn"].strip()
+
         r = requests.get(f"https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}")
         data = r.json()
 
         if data.get("items"):
             v = data["items"][0]["volumeInfo"]
-            title = v.get("title", "")
-authors = ", ".join(v.get("authors", []))
-publisher = v.get("publisher", "")
-published = v.get("publishedDate", "")[:4]
-pages = v.get("pageCount", "")
-description = v.get("description", "")
-cover = v.get("imageLinks", {}).get("thumbnail", "")
 
-           with sqlite3.connect(DB) as con:
-    con.execute(
-        """
-        INSERT OR IGNORE INTO books 
-        (isbn, title, authors, publisher, published_year, pages, description, cover)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-        (
-            isbn,
-            title,
-            authors,
-            publisher,
-            published,
-            pages,
-            description,
-            cover
-        )
-    )
+            title = v.get("title", "")
+            authors = ", ".join(v.get("authors", []))
+            publisher = v.get("publisher", "")
+            published = v.get("publishedDate", "")[:4]
+            pages = v.get("pageCount", "")
+            description = v.get("description", "")
+            cover = v.get("imageLinks", {}).get("thumbnail", "")
+
+            with sqlite3.connect(DB) as con:
+                con.execute(
+                    """
+                    INSERT OR IGNORE INTO books
+                    (isbn, title, authors, publisher, published_year, pages, description, cover)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        isbn,
+                        title,
+                        authors,
+                        publisher,
+                        published,
+                        pages,
+                        description,
+                        cover
+                    )
+                )
 
     with sqlite3.connect(DB) as con:
-        books = con.execute("SELECT * FROM books").fetchall()
+        books = con.execute("SELECT * FROM books ORDER BY id DESC").fetchall()
 
     return render_template("index.html", books=books)
+
 
 @app.route("/favorite/<int:id>")
 def favorite(id):
