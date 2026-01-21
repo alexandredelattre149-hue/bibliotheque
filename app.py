@@ -78,11 +78,24 @@ pages = v.get("pageCount", "")
 description = v.get("description", "")
 cover = v.get("imageLinks", {}).get("thumbnail", "")
 
-            with sqlite3.connect(DB) as con:
-                con.execute(
-    "INSERT OR IGNORE INTO books (isbn,title,authors,cover) VALUES (?,?,?,?)",
-    (isbn, title, authors, cover)
-)
+           with sqlite3.connect(DB) as con:
+    con.execute(
+        """
+        INSERT OR IGNORE INTO books 
+        (isbn, title, authors, publisher, published_year, pages, description, cover)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            isbn,
+            title,
+            authors,
+            publisher,
+            published,
+            pages,
+            description,
+            cover
+        )
+    )
 
     with sqlite3.connect(DB) as con:
         books = con.execute("SELECT * FROM books").fetchall()
