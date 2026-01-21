@@ -109,13 +109,21 @@ def library():
 
     return render_template("index.html", books=books)
 
-
 @app.route("/favorite/<int:id>")
 def favorite(id):
     with sqlite3.connect(DB) as con:
         con.execute("UPDATE books SET favorite = 1 - favorite WHERE id=?", (id,))
     return redirect("/library")
-
+@app.route("/status/<int:id>", methods=["POST"])
+def update_status(id):
+    status = request.form.get("status")
+    if status:
+        with sqlite3.connect(DB) as con:
+            con.execute(
+                "UPDATE books SET status = ? WHERE id = ?",
+                (status, id)
+            )
+    return redirect("/library")
 
 @app.route("/logout")
 def logout():
