@@ -9,8 +9,8 @@ DB = "database.db"
 
 def init_db():
     with sqlite3.connect(DB) as con:
+        # Table des livres
         con.execute("DROP TABLE IF EXISTS books")
-
         con.execute("""
         CREATE TABLE books (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,6 +27,14 @@ def init_db():
         )
         """)
 
+        # Table d'authentification (OBLIGATOIRE)
+        con.execute("""
+        CREATE TABLE IF NOT EXISTS auth (
+            id INTEGER PRIMARY KEY,
+            password TEXT
+        )
+        """)
+        
         con.execute("""
         CREATE TABLE IF NOT EXISTS auth (
             id INTEGER PRIMARY KEY,
