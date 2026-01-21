@@ -9,15 +9,24 @@ DB = "database.db"
 
 def init_db():
     with sqlite3.connect(DB) as con:
+        con.execute("DROP TABLE IF EXISTS books")
+
         con.execute("""
-        CREATE TABLE IF NOT EXISTS books (
+        CREATE TABLE books (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             isbn TEXT UNIQUE,
             title TEXT,
             authors TEXT,
+            publisher TEXT,
+            published_year TEXT,
+            pages INTEGER,
+            description TEXT,
             cover TEXT,
+            status TEXT DEFAULT 'bibliotheque',
             favorite INTEGER DEFAULT 0
-        )""")
+        )
+        """)
+
         con.execute("""
         CREATE TABLE IF NOT EXISTS auth (
             id INTEGER PRIMARY KEY,
