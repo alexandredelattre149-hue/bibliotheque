@@ -7,9 +7,10 @@ app.secret_key = os.environ.get("SECRET_KEY", "change_me")
 
 DB = "database.db"
 
+
 def init_db():
     with sqlite3.connect(DB) as con:
-        # Table des livres
+        # Livres
         con.execute("DROP TABLE IF EXISTS books")
         con.execute("""
         CREATE TABLE books (
@@ -27,21 +28,17 @@ def init_db():
         )
         """)
 
-        # Table d'authentification (OBLIGATOIRE)
+        # Authentification
         con.execute("""
         CREATE TABLE IF NOT EXISTS auth (
             id INTEGER PRIMARY KEY,
             password TEXT
         )
         """)
-        
-        con.execute("""
-        CREATE TABLE IF NOT EXISTS auth (
-            id INTEGER PRIMARY KEY,
-            password TEXT
-        )""")
+
 
 init_db()
+
 
 @app.route("/", methods=["GET", "POST"])
 def login():
@@ -65,14 +62,15 @@ def login():
             return redirect("/library")
 
     return render_template("login.html", first=False)
-    @app.route("/library", methods=["GET", "POST"])
+
+
+@app.route("/library", methods=["GET", "POST"])
 def library():
     if not session.get("auth"):
         return redirect("/")
 
     if request.method == "POST":
         isbn = request.form["isbn"].strip()
-
         r = requests.get(f"https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}")
         data = r.json()
 
@@ -118,10 +116,8 @@ def favorite(id):
         con.execute("UPDATE books SET favorite = 1 - favorite WHERE id=?", (id,))
     return redirect("/library")
 
+
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/")
-
-if __name__ == "__main__":
-    app.run()
