@@ -63,7 +63,6 @@ def login():
 
     return render_template("login.html", first=False)
 
-
 @app.route("/library", methods=["GET", "POST"])
 def library():
     if not session.get("auth"):
@@ -77,14 +76,6 @@ def library():
         if data.get("items"):
             v = data["items"][0]["volumeInfo"]
 
-            title = v.get("title", "")
-            authors = ", ".join(v.get("authors", []))
-            publisher = v.get("publisher", "")
-            published = v.get("publishedDate", "")[:4]
-            pages = v.get("pageCount", "")
-            description = v.get("description", "")
-            cover = v.get("imageLinks", {}).get("thumbnail", "")
-
             with sqlite3.connect(DB) as con:
                 con.execute(
                     """
@@ -94,34 +85,38 @@ def library():
                     """,
                     (
                         isbn,
-                        title,
-                        authors,
-                        publisher,
-                        published,
-                        pages,
-                        description,
-                        cover
+                        v.get("title", ""),
+                        ", ".join(v.get("authors", [])),
+                        v.get("publisher", ""),
+                        v.get("publishedDate", "")[:4],
+                        v.get("pageCount", ""),
+                        v.get("description", ""),
+                        v.get("imageLinks", {}).get("thumbnail", "")
                     )
                 )
 
     filter_status = request.args.get("filter")
 
-with sqlite3.connect(DB) as con:
-    if filter_status == "favorites":
-        books = con.execute(
-            "SELECT * FROM books WHERE favorite = 1 ORDER BY id DESC"
-        ).fetchall()
-    elif filter_status:
-        books = con.execute(
-            "SELECT * FROM books WHERE status = ? ORDER BY id DESC",
-            (filter_status,)
-        ).fetchall()
-    else:
-        books = con.execute(
-            "SELECT * FROM books ORDER BY id DESC"
-        ).fetchall()
+    with sqlite3.connect(DB) as con:
+        if filter_status == "favorites":
+            books = con.execute(
+                "SELECT * FROM books WHERE favorite = 1 ORDER BY id DESC"
+            ).fetchall()
+        elif filter_status:
+            books = con.execute(
+                "SELECT * FROM books WHERE status = ? ORDER BY id DESC",
+                (filter_status,)
+            ).fetchall()
+        else:
+            books = con.execute(
+                "SELECT * FROM books ORDER BY id DESC"
+            ).fetchall()
 
-return render_template("index.html", books=books, filter_status=filter_status)
+    return render_template(
+        "index.html",
+        books=books,
+        filter_status=filter_status
+    )
 
 @app.route("/favorite/<int:id>")
 def favorite(id):
