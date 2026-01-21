@@ -143,4 +143,19 @@ a {
                         <option value="pal" {{ "selected" if b[9]=="pal" else "" }}>📖</option>
                         <option value="encours" {{ "selected" if b[9]=="encours" else "" }}>⏳</option>
                         <option value="lu" {{ "selected" if b[9]=="lu" else "" }}>✅</option>
-                    </sel
+                    </select>
+                </form>
+
+                <a href="/favorite/{{ b[0] }}">
+                    {{ "❤️" if b[10] else "🤍" }}
+                </a>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+</div>
+
+<a href="/logout" class="logout">Déconnexion</a>
+
+</body>
+</html>
