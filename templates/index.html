@@ -68,9 +68,106 @@
             text-decoration: none;
             color: #0066cc;
         }
-    </style>
-</head>
-<body>
+   <style>
+:root {
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --primary: #4f46e5;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+}
+
+body {
+    margin: 0;
+    padding: 40px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+input, select, button {
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-size: 14px;
+}
+
+button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+.library {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.book {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+.book img {
+    height: 140px;
+    border-radius: 6px;
+}
+
+.book-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.book-title {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.book-meta {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.book-actions {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+a {
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.logout {
+    display: inline-block;
+    margin-top: 30px;
+    color: var(--muted);
+    font-size: 14px;
+}
+</style>
+
 
 <h2>📚 Ma bibliothèque</h2>
 
@@ -79,11 +176,37 @@
     <button type="submit">Ajouter le livre</button>
 </form>
 
+<div class="library">
 {% for b in books %}
-<div class="book">
-    {% if b[8] %}
-        <img src="{{ b[8] }}">
-    {% endif %}
+    <div class="book">
+        {% if b[8] %}
+            <img src="{{ b[8] }}">
+        {% endif %}
+
+        <div class="book-content">
+            <div class="book-title">{{ b[2] }}</div>
+            <div class="book-meta">{{ b[3] }}</div>
+            <div class="book-meta">{{ b[4] }} {{ b[5] }}</div>
+
+            <div class="book-actions">
+                <form method="post" action="/status/{{ b[0] }}">
+                    <select name="status" onchange="this.form.submit()">
+                        <option value="bibliotheque" {{ "selected" if b[9]=="bibliotheque" else "" }}>📚</option>
+                        <option value="pal" {{ "selected" if b[9]=="pal" else "" }}>📖</option>
+                        <option value="encours" {{ "selected" if b[9]=="encours" else "" }}>⏳</option>
+                        <option value="lu" {{ "selected" if b[9]=="lu" else "" }}>✅</option>
+                    </select>
+                </form>
+
+                <a href="/favorite/{{ b[0] }}">
+                    {{ "❤️" if b[10] else "🤍" }}
+                </a>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+</div>
+
 
     <div class="book-details">
         <h3>{{ b[2] }}</h3>
@@ -126,7 +249,7 @@
 </div>
 {% endfor %}
 
-<a href="/logout">Déconnexion</a>
+<a href="/logout" class="logout">Déconnexion</a>
 
 </body>
 </html>
