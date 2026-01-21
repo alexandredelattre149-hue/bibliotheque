@@ -104,10 +104,24 @@ def library():
                     )
                 )
 
-    with sqlite3.connect(DB) as con:
-        books = con.execute("SELECT * FROM books ORDER BY id DESC").fetchall()
+    filter_status = request.args.get("filter")
 
-    return render_template("index.html", books=books)
+with sqlite3.connect(DB) as con:
+    if filter_status == "favorites":
+        books = con.execute(
+            "SELECT * FROM books WHERE favorite = 1 ORDER BY id DESC"
+        ).fetchall()
+    elif filter_status:
+        books = con.execute(
+            "SELECT * FROM books WHERE status = ? ORDER BY id DESC",
+            (filter_status,)
+        ).fetchall()
+    else:
+        books = con.execute(
+            "SELECT * FROM books ORDER BY id DESC"
+        ).fetchall()
+
+return render_template("index.html", books=books, filter_status=filter_status)
 
 @app.route("/favorite/<int:id>")
 def favorite(id):
