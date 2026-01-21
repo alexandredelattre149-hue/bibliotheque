@@ -62,14 +62,18 @@ def library():
         if data.get("items"):
             v = data["items"][0]["volumeInfo"]
             title = v.get("title", "")
-            authors = ", ".join(v.get("authors", []))
-            cover = v.get("imageLinks", {}).get("thumbnail", "")
+authors = ", ".join(v.get("authors", []))
+publisher = v.get("publisher", "")
+published = v.get("publishedDate", "")[:4]
+pages = v.get("pageCount", "")
+description = v.get("description", "")
+cover = v.get("imageLinks", {}).get("thumbnail", "")
 
             with sqlite3.connect(DB) as con:
                 con.execute(
-                    "INSERT OR IGNORE INTO books (isbn,title,authors,cover) VALUES (?,?,?,?)",
-                    (isbn, title, authors, cover)
-                )
+    "INSERT OR IGNORE INTO books (isbn,title,authors,cover) VALUES (?,?,?,?)",
+    (isbn, title, authors, cover)
+)
 
     with sqlite3.connect(DB) as con:
         books = con.execute("SELECT * FROM books").fetchall()
